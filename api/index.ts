@@ -32,4 +32,8 @@ app.get('/', (req, res) => {
     return res.send('Hello Yellow');
 })
 
-app.listen(8080, () => console.log('Running.'));
+//app.listen(8080, () => console.log('Running.'));
+
+export {
+    app
+};
