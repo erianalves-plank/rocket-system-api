@@ -1,5 +1,5 @@
 import { Crew } from "../model/crew";
-import AppDataSource from "../datasource/dataSource";
+import AppDataSource from "../ormconfig";
 import { Crewman } from "../model/crewman";
 
 const crewRepository = AppDataSource.getRepository(Crew);

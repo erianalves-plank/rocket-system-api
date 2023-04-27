@@ -5,7 +5,7 @@ type RocketRequest = {
     name : string;
 }
 
-import AppDataSource from "../datasource/dataSource";
+import AppDataSource from "../ormconfig";
 const rocketRepository = AppDataSource.getRepository(Rocket);
 
 class RocketService {

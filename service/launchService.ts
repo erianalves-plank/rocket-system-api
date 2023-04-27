@@ -1,7 +1,7 @@
 import { Launch } from "../model/launch";
 import { Rocket } from "../model/rocket";
 import { Crew } from "../model/crew";
-import AppDataSource from "../datasource/dataSource";
+import AppDataSource from "../ormconfig";
 
 const launchRepository = AppDataSource.getRepository(Launch);
 const crewRepository = AppDataSource.getRepository(Crew);

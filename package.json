@@ -1,5 +1,5 @@
 {
-  "name": "challenge-weekthree",
+  "name": "rocket-system-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "initTSC": "tsc --init",
-    "typeorm": "ts-node-dev node_modules/.bin/typeorm -d datasource/dataSource.ts"
+    "typeorm": "ts-node-dev node_modules/.bin/typeorm -d ormconfig.ts",
+    "vercel-build": ""
   },
   "keywords": [],
   "author": "",
