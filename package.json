@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "initTSC": "tsc --init",
     "typeorm": "ts-node-dev node_modules/.bin/typeorm -d ormconfig.ts",
-    "vercel-build": ""
+    "vercel-build": "npm run typeorm migration:run"
   },
   "keywords": [],
   "author": "",
