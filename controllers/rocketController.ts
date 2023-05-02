@@ -1,54 +1,71 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
+import { RocketRepository } from '../repository/rocketRepository';
 import { RocketService } from '../service/rocketService';
-
 class RocketController {
-    async handle(request: Request, response: Response){
-        const name = request.body.name;
+    public service : RocketService;
+    public repo: RocketRepository;
 
-        const service = new RocketService();
-        const result = await service.execute({name});
-
-        if (result instanceof Error) {
-            return response.status(400).json(result.message);
-        }
-        return response.json(result);
+    constructor(){
+        this.repo = new RocketRepository();
+        this.service = new RocketService(this.repo);
     }
 
     async handleGetRockets(request: Request, response: Response){
-        const service = new RocketService();
-        const rockets = await service.getAllRockets();
-
-        return response.json(rockets);
+        try {
+            const result = await this.service.getRockets();
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleDeleteRocket(request: Request, response: Response){
-        const { id } = request.params;
+    async handleGetRocketById(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            const result = await this.service.getRocketById(id);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(400).json(err.message);
+        }
+    }
 
-        const service = new RocketService();
-        
-        const result = await service.deleteRocket(id);
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.status(204).end();
+    async handleCreateRocket(request: Request, response: Response){
+        try {
+            const id = uuidv4();
+            const name = request.body.name;
+            const result = await this.service.createRocket(id, name) ;
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(400).json(err.message);
+        }
     }
 
     async handleUpdateRocket(request: Request, response: Response){
-        const { id } = request.params;
-        const { name } = request.body;
-        const service = new RocketService();
-        
-        const result = await service.updateRocket({ name });
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.json(result);
+        try {
+            const id = request.params.id;
+            const name = request.body.name;
+            const result = await this.service.updateRocket(id, name);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(400).json(err.message);
+        }
+    }
+    async handleDeleteRocket(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            await this.service.deleteRocket(id);
+            return response.status(204).end();
+        }
+        catch (err) {
+            return response.sendStatus(400).json(err.message);
+        }
     }
 }
-
 
 export { RocketController };

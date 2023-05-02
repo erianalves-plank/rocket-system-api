@@ -1,50 +1,42 @@
+import AppDataSource from "../ormconfig";
+import { Rocket } from "../model/rocket";
+
 class RocketRepository {
-    private readonly url = process.env['JSON_SERVER'] + '/rocket';
 
-    async getRocketById(rocketId: number) {
-        const response = await fetch(this.url + '/' + rocketId);
-        const jsonData = await response.json();
-        return jsonData;
+    private repository = AppDataSource.getRepository(Rocket);
+
+    async findAll() {
+        const rockets = await this.repository.find();
+        return rockets;
     }
 
-    async getRockets(){
-        const response = await fetch(this.url);
-        const jsonData = await response.json();
-        return jsonData;
+    async findById(rocketId: string){
+        const rocket = await this.repository.findOneBy({id: rocketId});
+
+        return rocket;
     }
 
-    async updateRocketById(rocketId : number, newRocket: Object){
-        const response = await fetch(this.url + '/' + rocketId, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newRocket)
+    async create({ id, name }: Rocket){
+        const rocket = this.repository.create({
+            id,
+            name,
         });
 
-        return response;
+        await this.repository.save(rocket);
+
+        return rocket;
     }
 
-    async deleteRocketById(rocketId : number){
-        const response = await fetch(this.url + '/'+ rocketId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
-        return response;
+    async update(rocket: Rocket, name: string){
+        rocket.name = name;
+
+        await this.repository.save(rocket);
+
+        return rocket;
     }
 
-    async createRocket(rocketId : number, newRocket: Object){
-        const response = await fetch(this.url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newRocket)
-        });
-            
-        return response;
+    async delete(rocketId: string){
+        await this.repository.delete(rocketId);
     }
 }
 

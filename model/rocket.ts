@@ -1,9 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity('rocket')
 export class Rocket {
     @Column()
     name: string;
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn("varchar", { length: 255 })
+    id: string;
 }

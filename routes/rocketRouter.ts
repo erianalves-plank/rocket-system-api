@@ -2,14 +2,16 @@ import express from 'express';
 import { RocketController }  from '../controllers/rocketController'; 
 
 const rocketRouter = express.Router();
+const rocketController = new RocketController();
 
 rocketRouter.route('/')
-    .post(new RocketController().handle)
-    .get(new RocketController().handleGetRockets);
+    .post(rocketController.handleCreateRocket.bind(rocketController))
+    .get(rocketController.handleGetRockets.bind(rocketController));
 
 rocketRouter.route('/:id')
-    .delete(new RocketController().handleDeleteRocket)
-    .put(new RocketController().handleUpdateRocket);
+    .get(rocketController.handleGetRocketById.bind(rocketController))
+    .put(rocketController.handleUpdateRocket.bind(rocketController))
+    .delete(rocketController.handleDeleteRocket.bind(rocketController));
 
 
 export { rocketRouter };

@@ -6,11 +6,11 @@ import { Launch } from "./model/launch";
 
 const AppDataSource = new DataSource({
   type: "postgres",
-  host: "raja.db.elephantsql.com",
+  host: "localhost",
   port: 5432,
-  username: "loostbok",
-  password: "WYzjrF6L1HPJ_yVNFT5hjI1GhlSqnxQ3",
-  database: "loostbok",
+  username: "postgres",
+  password: "postgres",
+  database: "localbase",
   entities: [Rocket, Crewman, Crew, Launch],
   migrations: ["./database/migrations/*.ts"]
 });

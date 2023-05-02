@@ -1,47 +1,48 @@
-import { Rocket } from "../model/rocket";
-
-type RocketRequest = {
-    id?: number;
-    name : string;
-}
-
-import AppDataSource from "../ormconfig";
-const rocketRepository = AppDataSource.getRepository(Rocket);
+import { RocketRepository } from "../repository/rocketRepository";
 
 class RocketService {
 
-    async execute({ name }: RocketRequest): Promise<Rocket | Error> {
+    private rocketRepository : RocketRepository;
 
-        const rocket = rocketRepository.create({
-            name,
-        });
-        await rocketRepository.save(rocket);
-
-        return rocket;
+    constructor(rocketRepository: RocketRepository) {
+        this.rocketRepository = rocketRepository;
     }
 
-    async getAllRockets() {
-        const rockets = await rocketRepository.find();
-        return rockets;
+    async getRockets() {
+        return await this.rocketRepository.findAll();
     }
 
-    async deleteRocket(rocketId: string){
-        if (!(await rocketRepository.findOneBy({id: parseInt(rocketId)})))
-            return new Error("Rocket not found");
+    async getRocketById(rocketId : string){
+        const rocket = this.rocketRepository.findById(rocketId);
 
-        await rocketRepository.delete(rocketId);
-    }
-
-    async updateRocket({id, name} : RocketRequest){
-        const rocket = await rocketRepository.findOneBy({id: id});
         if (!rocket)
-            return new Error("Rocket not found");
-        
-        rocket.name = name;
-
-        await rocketRepository.save(rocket);
+            return new Error('Resource not found.');
 
         return rocket;
+    }
+
+    async createRocket(id: string, name: string) {
+        return this.rocketRepository.create({id, name});
+    }
+
+    async updateRocket(id: string, name: string){
+        const rocket = await this.getRocketById(id);
+
+        if (rocket){
+            const rocketUpdated = {
+                "id": id,
+                "name": rocket.name
+            }
+            return this.rocketRepository.update(rocketUpdated, name);
+        }
+
+
+    }
+
+    async deleteRocket(id: string){
+        const rocket = await this.getRocketById(id); 
+        if (rocket)
+            await this.rocketRepository.delete(id);
     }
 
 }
