@@ -1,19 +1,13 @@
-import { RocketRepository } from "../repository/rocketRepository";
+import { rocketRepository } from "../repository";
 
 class RocketService {
 
-    private rocketRepository : RocketRepository;
-
-    constructor(rocketRepository: RocketRepository) {
-        this.rocketRepository = rocketRepository;
-    }
-
     async getRockets() {
-        return await this.rocketRepository.findAll();
+        return await rocketRepository.findAll();
     }
 
     async getRocketById(rocketId : string){
-        const rocket = this.rocketRepository.findById(rocketId);
+        const rocket = rocketRepository.findById(rocketId);
 
         if (!rocket)
             throw new Error('Resource not found.');
@@ -22,21 +16,21 @@ class RocketService {
     }
 
     async createRocket(id: string, name: string) {
-        return this.rocketRepository.create({id, name});
+        return rocketRepository.create({id, name});
     }
 
     async updateRocket(id: string, name: string){
         const rocket = await this.getRocketById(id);
 
         if (rocket)
-            return this.rocketRepository.update(rocket, name);
+            return rocketRepository.update(rocket, name);
     
     }
 
     async deleteRocket(id: string){
         const rocket = await this.getRocketById(id); 
         if (rocket)
-            await this.rocketRepository.delete(id);
+            await rocketRepository.delete(id);
     }
 
 }

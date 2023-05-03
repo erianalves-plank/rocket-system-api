@@ -23,14 +23,7 @@ class LaunchRepository {
     }
 
     async create({ id, launchCode, date, success, rocket, crew }: Launch){
-        const launch = this.repository.create({
-            id,
-            launchCode,
-            date,
-            success,
-            rocket,
-            crew,
-        });
+        const launch = new Launch({launchCode, date, success, rocket, crew});
 
         await this.repository.save(launch);
         return launch;

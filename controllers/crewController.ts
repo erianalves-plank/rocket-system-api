@@ -1,19 +1,13 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CrewRepository } from '../repository/crewRepository';
 import { CrewService } from '../service/crewService';
-import { CrewmanRepository } from '../repository/crewmanRepository';
 
 class CrewController {
     private service : CrewService;
-    private crewRepo: CrewRepository;
-    private crewmanRepo: CrewmanRepository;
 
     constructor(){
-        this.crewRepo = new CrewRepository();
-        this.crewmanRepo = new CrewmanRepository();
-        this.service = new CrewService(this.crewRepo, this.crewmanRepo);
+        this.service = new CrewService();
     }
 
     async handleGetCrews(request: Request, response: Response){

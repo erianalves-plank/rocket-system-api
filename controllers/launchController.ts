@@ -1,22 +1,14 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import { LaunchRepository } from '../repository/launchRepository';
 import { LaunchService } from '../service/launchService';
-import { RocketRepository } from '../repository/rocketRepository';
-import { CrewRepository } from '../repository/crewRepository';
+
 
 class LaunchController {
     private service : LaunchService;
-    private launchRepo: LaunchRepository;
-    private rocketRepo: RocketRepository;
-    private crewRepo: CrewRepository;
 
     constructor(){
-        this.launchRepo = new LaunchRepository();
-        this.rocketRepo = new RocketRepository();
-        this.crewRepo = new CrewRepository();
-        this.service = new LaunchService(this.launchRepo, this.rocketRepo, this.crewRepo);
+        this.service = new LaunchService();
     }
 
     async handleGetLaunchs(request: Request, response: Response){

@@ -1,15 +1,13 @@
 import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 
-import { RocketRepository } from '../repository/rocketRepository';
 import { RocketService } from '../service/rocketService';
+
 class RocketController {
     public service : RocketService;
-    public repo: RocketRepository;
 
     constructor(){
-        this.repo = new RocketRepository();
-        this.service = new RocketService(this.repo);
+        this.service = new RocketService();
     }
 
     async handleGetRockets(request: Request, response: Response){

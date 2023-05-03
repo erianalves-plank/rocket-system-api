@@ -1,19 +1,13 @@
-import { CrewmanRepository } from "../repository/crewmanRepository"
+import { crewmanRepository } from "../repository"
 
 class CrewmanService {
 
-    private crewmanRepository: CrewmanRepository;
-
-    constructor(crewmanRepository: CrewmanRepository){
-        this.crewmanRepository = crewmanRepository;
-    }
-
     async getCrewmen(){
-        return await this.crewmanRepository.findAll();
+        return await crewmanRepository.findAll();
     }
 
     async getCrewmanById(crewmanId: string) {
-        const crewman = this.crewmanRepository.findById(crewmanId);
+        const crewman = crewmanRepository.findById(crewmanId);
 
         if (!crewman)
             throw new Error('Resource not found');
@@ -22,20 +16,20 @@ class CrewmanService {
     }
 
     async createCrewman(id: string, name: string, patent: string){
-        return this.crewmanRepository.create({id, name, patent});
+        return crewmanRepository.create({id, name, patent});
     }
 
     async updateCrewman(id: string, name: string, patent: string){
         const crewman = await this.getCrewmanById(id);
 
         if (crewman)
-            return this.crewmanRepository.update(crewman, name, patent);
+            return crewmanRepository.update(crewman, name, patent);
     }
 
     async deleteCrewman(id: string){
         const crewman = await this.getCrewmanById(id);
         if (crewman)
-            await this.crewmanRepository.delete(id);
+            await crewmanRepository.delete(id);
     }
 
 }

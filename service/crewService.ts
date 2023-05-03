@@ -1,22 +1,13 @@
-import { CrewRepository } from "../repository/crewRepository"
-import { CrewmanRepository } from "../repository/crewmanRepository";
+import { crewRepository, crewmanRepository } from "../repository";
 
 class CrewService {
 
-    private crewRepository: CrewRepository;
-    private crewmanRepository: CrewmanRepository;
-
-    constructor(crewRepository: CrewRepository, crewmanRepository: CrewmanRepository){
-        this.crewRepository = crewRepository;
-        this.crewmanRepository = crewmanRepository;
-    }
-
     async getCrews(){
-        return await this.crewRepository.findAll();
+        return await crewRepository.findAll();
     }
 
     async getCrewById(crewId: string) {
-        const crew = this.crewRepository.findById(crewId);
+        const crew = crewRepository.findById(crewId);
 
         if (!crew)
             throw new Error('Resource not found');
@@ -27,10 +18,10 @@ class CrewService {
     async createCrew(id: string, name: string, crewmenIds: string[]){
         let crewmen = [];
         for (const crewmanId of crewmenIds){
-            let crewman = (await this.crewmanRepository.findById(crewmanId));
+            let crewman = (await crewmanRepository.findById(crewmanId));
             crewmen.push(crewman);
         }
-        return this.crewRepository.create({id, name, crewmen});
+        return crewRepository.create({id, name, crewmen});
     }
 
     async updateCrew(id: string, name: string, crewmenIds: string[]){
@@ -38,18 +29,18 @@ class CrewService {
         
         let crewmen = [];
         for (const crewmanId of crewmenIds){
-            let crewman = (await this.crewmanRepository.findById(crewmanId));
+            let crewman = (await crewmanRepository.findById(crewmanId));
             crewmen.push(crewman);
         }
 
         if (crew)
-            return this.crewRepository.update(crew, name, crewmen);
+            return crewRepository.update(crew, name, crewmen);
     }
 
     async deleteCrew(id: string){
         const crew = await this.getCrewById(id);
         if (crew)
-            await this.crewRepository.delete(id);
+            await crewRepository.delete(id);
     }
 
 }
