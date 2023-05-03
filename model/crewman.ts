@@ -1,14 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity('crewman')
 export class Crewman {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn("varchar", { length: 255 })
+    id: string;
 
-    @Column()
+    @Column("varchar", { length: 255 })
     name: string;
 
-    @Column()
+    @Column("varchar", { length: 255 })
     patent: string;
 
 }

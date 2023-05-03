@@ -1,73 +1,80 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
+import { LaunchRepository } from '../repository/launchRepository';
 import { LaunchService } from '../service/launchService';
+import { RocketRepository } from '../repository/rocketRepository';
+import { CrewRepository } from '../repository/crewRepository';
 
 class LaunchController {
-    async handle(request: Request, response: Response){
-        const launchCode = request.body.launchCode;
-        const date = request.body.date;
-        const success = request.body.success;
-        const rocketId = request.body.rocketId;
-        const crewId = request.body.crewId;
+    private service : LaunchService;
+    private launchRepo: LaunchRepository;
+    private rocketRepo: RocketRepository;
+    private crewRepo: CrewRepository;
 
-
-        const service = new LaunchService();
-        const result = await service.execute({launchCode, date, success, rocketId, crewId});
-
-        if (result instanceof Error) {
-            return response.status(400).json(result.message);
-        }
-        return response.json(result);
+    constructor(){
+        this.launchRepo = new LaunchRepository();
+        this.rocketRepo = new RocketRepository();
+        this.crewRepo = new CrewRepository();
+        this.service = new LaunchService(this.launchRepo, this.rocketRepo, this.crewRepo);
     }
 
-    async handleGetLaunch(request: Request, response: Response){
-        const service = new LaunchService();
-        const launch = await service.getAllLaunch();
-
-        return response.json(launch);
+    async handleGetLaunchs(request: Request, response: Response){
+        try {
+            const result = await this.service.getLaunchs();
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
     async handleGetLaunchById(request: Request, response: Response){
-        const { id } = request.params;
-
-        const service = new LaunchService();
-        const launch = await service.getLaunchById(id);
-
-        return response.json(launch);
+        try {
+            const id = request.params.id;
+            const result = await this.service.getLaunchById(id);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleDeleteLaunch(request: Request, response: Response){
-        const { id } = request.params;
-
-        const service = new LaunchService();
-        
-        const result = await service.delete(id);
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.status(204).end();
+    async handleCreateLaunch(request: Request, response: Response){
+        try {
+            const id = uuidv4();
+            const { launchCode, date, success, rocketId, crewId } = request.body;
+            const result = await this.service.createLaunch(id, launchCode, date, success, rocketId, crewId) ;
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
     async handleUpdateLaunch(request: Request, response: Response){
-        const id = parseInt(request.params.id);
-        const launchCode = request.body.launchCode;
-        const date = request.body.date;
-        const success = request.body.success;
-        const rocketId = request.body.rocketId;
-        const crewId = request.body.crewId;
-        const service = new LaunchService();
-        
-        const result = await service.update({ id, launchCode, date, success, rocketId, crewId });
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.json(result);
+        try {
+            const id = request.params.id;
+            const { launchCode, date, success, rocketId, crewId } = request.body;
+            const result = await this.service.updateLaunch(id, launchCode, date, success, rocketId, crewId);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
- 
+
+    async handleDeleteLaunch(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            await this.service.deleteLaunch(id);
+            return response.status(204).end();
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
+    }
 }
-export {
-    LaunchController
-};
+
+
+export { LaunchController };

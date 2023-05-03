@@ -29,7 +29,7 @@ class RocketController {
             return response.json(result);
         }
         catch (err) {
-            return response.sendStatus(400).json(err.message);
+            return response.sendStatus(500).json(err.message);
         }
     }
 
@@ -41,7 +41,7 @@ class RocketController {
             return response.json(result);
         }
         catch (err) {
-            return response.sendStatus(400).json(err.message);
+            return response.sendStatus(500).json(err.message);
         }
     }
 
@@ -53,7 +53,7 @@ class RocketController {
             return response.json(result);
         }
         catch (err) {
-            return response.sendStatus(400).json(err.message);
+            return response.sendStatus(500).json(err.message);
         }
     }
     async handleDeleteRocket(request: Request, response: Response){
@@ -63,7 +63,7 @@ class RocketController {
             return response.status(204).end();
         }
         catch (err) {
-            return response.sendStatus(400).json(err.message);
+            return response.sendStatus(500).json(err.message);
         }
     }
 }

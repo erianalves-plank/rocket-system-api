@@ -1,12 +1,12 @@
-import { Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { Crewman } from "./crewman";
 @Entity('crew')
 export class Crew {
 
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn("varchar", { length: 255 })
+    id: string;
 
-    @Column()
+    @Column("varchar", { length: 255 })
     name: string;
 
     @ManyToMany(() => Crewman, {

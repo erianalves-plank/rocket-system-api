@@ -1,65 +1,76 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
+import { CrewRepository } from '../repository/crewRepository';
 import { CrewService } from '../service/crewService';
+import { CrewmanRepository } from '../repository/crewmanRepository';
 
 class CrewController {
-    async handle(request: Request, response: Response){
-        const name = request.body.name;
-        const crewmen = request.body.crewmenId;
+    private service : CrewService;
+    private crewRepo: CrewRepository;
+    private crewmanRepo: CrewmanRepository;
 
-        const service = new CrewService();
-        const result = await service.execute({name, crewmen});
+    constructor(){
+        this.crewRepo = new CrewRepository();
+        this.crewmanRepo = new CrewmanRepository();
+        this.service = new CrewService(this.crewRepo, this.crewmanRepo);
+    }
 
-        if (result instanceof Error) {
-            return response.status(400).json(result.message);
+    async handleGetCrews(request: Request, response: Response){
+        try {
+            const result = await this.service.getCrews();
+            return response.json(result);
         }
-        return response.json(result);
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleGetCrew(request: Request, response: Response){
-        const service = new CrewService();
-        const crewmen = await service.getAllCrew();
-
-        return response.json(crewmen);
+    async handleGetCrewById(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            const result = await this.service.getCrewById(id);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleGetCrewbyId(request: Request, response: Response){
-        const { id } = request.params;
-
-        const service = new CrewService();
-        const crew = await service.getCrewById(id);
-
-        return response.json(crew);
-    }
-
-    async handleDeleteCrew(request: Request, response: Response){
-        const { id } = request.params;
-
-        const service = new CrewService();
-        
-        const result = await service.delete(id);
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.status(204).end();
+    async handleCreateCrew(request: Request, response: Response){
+        try {
+            const id = uuidv4();
+            const { name, crewmenIds } = request.body;
+            const result = await this.service.createCrew(id, name, crewmenIds) ;
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
     async handleUpdateCrew(request: Request, response: Response){
-        const id = parseInt(request.params.id);
-        const name = request.body.name;
-        const crewmen = request.body.crewmenId;
-        const service = new CrewService();
-        
-        const result = await service.update({ id, name, crewmen });
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.json(result);
+        try {
+            const id = request.params.id;
+            const { name, crewmenIds } = request.body;
+            const result = await this.service.updateCrew(id, name, crewmenIds);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
- 
+
+    async handleDeleteCrew(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            await this.service.deleteCrew(id);
+            return response.status(204).end();
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
+    }
 }
 
 

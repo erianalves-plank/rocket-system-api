@@ -1,18 +1,18 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from "typeorm";
 import { Rocket } from "./rocket";
 import { Crew } from "./crew";
 @Entity('launch')
 export class Launch {
-    @PrimaryGeneratedColumn()
-    id: number;
+    @PrimaryColumn("varchar", { length: 255 })
+    id: string;
 
-    @Column()
+    @Column("varchar", { length: 255 })
     launchCode: string;
     
-    @Column()
+    @Column("varchar", { length: 100 })
     date: string;
     
-    @Column()
+    @Column({ type: "boolean" })
     success: boolean;
     
     @OneToOne(() => Rocket)

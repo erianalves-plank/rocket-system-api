@@ -1,50 +1,55 @@
+import AppDataSource from "../ormconfig";
+import { Launch } from "../model/launch";
+import { Rocket } from "../model/rocket";
+import { Crew } from "../model/crew";
+
 class LaunchRepository {
-    private readonly url = process.env['JSON_SERVER'] + '/launch';
 
-    async getLaunchById(launchId: number) {
-        const response = await fetch(this.url + '/' + launchId);
-        const jsonData = await response.json();
-        return jsonData;
-    }
+    private repository = AppDataSource.getRepository(Launch);
 
-    async getLaunchs(){
-        const response = await fetch(this.url);
-        const jsonData = await response.json();
-        return jsonData;
-    }
-
-    async updateLaunchById(launchId : number, newLaunch: Object){
-        const response = await fetch(this.url + '/' + launchId, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newLaunch)
-        });
-
-        return response;
-    }
-
-    async deleteLaunchById(launchId : number){
-        const response = await fetch(this.url + '/'+ launchId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
+    async findAll() {
+        const launchs = await this.repository.find({
+            relations: {
+                rocket: true,
+                crew: true,
             },
         });
-        return response;
+        return launchs;
     }
 
-    async createLaunch(newLaunch: Object){
-        const response = await fetch(this.url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newLaunch)
+    async findById(launchId : string){
+        const launch = await this.repository.findOneBy({id: launchId});
+        return launch;
+    }
+
+    async create({ id, launchCode, date, success, rocket, crew }: Launch){
+        const launch = this.repository.create({
+            id,
+            launchCode,
+            date,
+            success,
+            rocket,
+            crew,
         });
-            
-        return response;
+
+        await this.repository.save(launch);
+        return launch;
+    }
+
+    async update(launch: Launch, launchCode : string, date: string, success: boolean, rocket: Rocket, crew: Crew){
+        launch.launchCode = launchCode;
+        launch.date = date;
+        launch.success = success;
+        launch.rocket = rocket;
+        launch.crew = crew;
+
+        await this.repository.save(launch);
+
+        return launch;
+    }
+
+    async delete(launchId : string){
+        return await this.repository.delete(launchId);
     }
 }
 

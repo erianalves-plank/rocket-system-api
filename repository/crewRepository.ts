@@ -1,50 +1,47 @@
+import AppDataSource from "../ormconfig";
+import { Crew } from "../model/crew";
+import { Crewman } from "../model/crewman";
+
 class CrewRepository {
-    private readonly url = process.env['JSON_SERVER'] + '/crew';
 
-    async getCrewById(crewId: number) {
-        const response = await fetch(this.url + '/' + crewId);
-        const jsonData = await response.json();
-        return jsonData;
-    }
+    private repository = AppDataSource.getRepository(Crew);
 
-    async getCrews(){
-        const response = await fetch(this.url);
-        const jsonData = await response.json();
-        return jsonData;
-    }
-
-    async updateCrewById(crewId : number, newCrew: Object){
-        const response = await fetch(this.url + '/' + crewId, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newCrew)
-        });
-
-        return response;
-    }
-
-    async deleteCrewById(crewId : number){
-        const response = await fetch(this.url + '/'+ crewId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
+    async findAll() {
+        const crews = await this.repository.find({
+            relations: {
+                crewmen: true,
             },
         });
-        return response;
+        return crews;
     }
 
-    async createCrew(newCrew: Object){
-        const response = await fetch(this.url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newCrew)
+    async findById(crewId : string){
+        const crew = await this.repository.findOneBy({id: crewId});
+        return crew;
+    }
+
+    async create({ id, name, crewmen }: Crew){
+        const crew = this.repository.create({
+            id,
+            name,
+            crewmen,
         });
-            
-        return response;
+
+        await this.repository.save(crew);
+        return crew;
+    }
+
+    async update(crew: Crew, name : string, crewmen: Crewman[]){
+        crew.name = name;
+        crew.crewmen = crewmen;
+
+        await this.repository.save(crew);
+
+        return crew;
+    }
+
+    async delete(crewId : string){
+        return await this.repository.delete(crewId);
     }
 }
 

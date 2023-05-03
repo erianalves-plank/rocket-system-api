@@ -1,44 +1,41 @@
-import { Crewman } from "../model/crewman";
-import AppDataSource from "../ormconfig";
-
-
-const crewmanRepository = AppDataSource.getRepository(Crewman);
+import { CrewmanRepository } from "../repository/crewmanRepository"
 
 class CrewmanService {
 
-    async execute({ name, patent }: Partial<Crewman>): Promise<Crewman | Error> {
-        const crewman = crewmanRepository.create({
-            name,
-            patent,
-        });
-        await crewmanRepository.save(crewman);
+    private crewmanRepository: CrewmanRepository;
 
-        return crewman;
+    constructor(crewmanRepository: CrewmanRepository){
+        this.crewmanRepository = crewmanRepository;
     }
 
-    async getAllCrewmen() {
-        const crewmen = await crewmanRepository.find();
-        return crewmen;
+    async getCrewmen(){
+        return await this.crewmanRepository.findAll();
     }
 
-    async delete(crewmanId: string){
-        if (!(await crewmanRepository.findOneBy({id: parseInt(crewmanId)})))
-            return new Error("Crewman not found");
+    async getCrewmanById(crewmanId: string) {
+        const crewman = this.crewmanRepository.findById(crewmanId);
 
-        await crewmanRepository.delete(crewmanId);
-    }
-
-    async update({id, name, patent} : Partial<Crewman>){
-        const crewman = await crewmanRepository.findOneBy({id: id});
         if (!crewman)
-            return new Error("Crewman not found");
-        
-        crewman.name = name;
-        crewman.patent = patent;
-
-        await crewmanRepository.save(crewman);
+            throw new Error('Resource not found');
 
         return crewman;
+    }
+
+    async createCrewman(id: string, name: string, patent: string){
+        return this.crewmanRepository.create({id, name, patent});
+    }
+
+    async updateCrewman(id: string, name: string, patent: string){
+        const crewman = await this.getCrewmanById(id);
+
+        if (crewman)
+            return this.crewmanRepository.update(crewman, name, patent);
+    }
+
+    async deleteCrewman(id: string){
+        const crewman = await this.getCrewmanById(id);
+        if (crewman)
+            await this.crewmanRepository.delete(id);
     }
 
 }

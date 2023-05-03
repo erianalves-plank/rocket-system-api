@@ -16,7 +16,7 @@ class RocketService {
         const rocket = this.rocketRepository.findById(rocketId);
 
         if (!rocket)
-            return new Error('Resource not found.');
+            throw new Error('Resource not found.');
 
         return rocket;
     }
@@ -28,15 +28,9 @@ class RocketService {
     async updateRocket(id: string, name: string){
         const rocket = await this.getRocketById(id);
 
-        if (rocket){
-            const rocketUpdated = {
-                "id": id,
-                "name": rocket.name
-            }
-            return this.rocketRepository.update(rocketUpdated, name);
-        }
-
-
+        if (rocket)
+            return this.rocketRepository.update(rocket, name);
+    
     }
 
     async deleteRocket(id: string){

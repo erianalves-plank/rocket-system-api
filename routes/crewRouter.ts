@@ -2,14 +2,14 @@ import express from 'express';
 import { CrewController } from '../controllers/crewController';
 
 const crewRouter = express.Router();
-
+const crewController = new CrewController();
 crewRouter.route('/')
-    .get(new CrewController().handleGetCrew)
-    .post(new CrewController().handle);
+    .get(crewController.handleGetCrews.bind(crewController))
+    .post(crewController.handleCreateCrew.bind(crewController));
 
 crewRouter.route('/:id')
-    .get(new CrewController().handleGetCrewbyId)
-    .delete(new CrewController().handleDeleteCrew)
-    .put(new CrewController().handleUpdateCrew);
+    .get(crewController.handleGetCrewById.bind(crewController))
+    .delete(crewController.handleDeleteCrew.bind(crewController))
+    .put(crewController.handleUpdateCrew.bind(crewController));
 
 export { crewRouter };

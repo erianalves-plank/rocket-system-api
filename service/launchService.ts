@@ -1,80 +1,56 @@
-import { Launch } from "../model/launch";
-import { Rocket } from "../model/rocket";
-import { Crew } from "../model/crew";
-import AppDataSource from "../ormconfig";
-
-const launchRepository = AppDataSource.getRepository(Launch);
-const crewRepository = AppDataSource.getRepository(Crew);
-const rocketRepository = AppDataSource.getRepository(Rocket);
-
-type LaunchRequest = {
-    id?: number;
-    launchCode: string;
-    date: string;
-    success?: boolean;
-    rocketId: number;
-    crewId?: number;
-}
+import { NumericType } from "typeorm";
+import { LaunchRepository } from "../repository/launchRepository"
+import { RocketRepository } from "../repository/rocketRepository";
+import { CrewRepository } from "../repository/crewRepository";
 
 class LaunchService {
-    async execute({ launchCode, date, success, rocketId, crewId}: LaunchRequest): Promise<Launch | Error> {
 
-        const rocket = await rocketRepository.findOneBy({ id: rocketId });
-        const crew = await crewRepository.findOneBy({ id: crewId });
+    private launchRepository: LaunchRepository;
+    private rocketRepository: RocketRepository;
+    private crewRepository: CrewRepository;
 
-        const launch = launchRepository.create({
-            launchCode,
-            date,
-            success,
-            rocket,
-            crew 
-        }); 
-
-        await launchRepository.save(launch);
-
-        return launch;
+    constructor(launchRepository: LaunchRepository, rocketRepository: RocketRepository, crewRepository: CrewRepository){
+        this.launchRepository = launchRepository;
+        this.rocketRepository = rocketRepository;
+        this.crewRepository = crewRepository;
     }
 
-    async getAllLaunch() {
-        const launch = await launchRepository.find({
-            relations: {
-                rocket: true,
-                crew: true,
-            },
-        });
-        return launch;
+    async getLaunchs(){
+        return await this.launchRepository.findAll();
     }
 
-    async getLaunchById(launchId: string){
-        const launch = await launchRepository.findOneBy({id: parseInt(launchId)});
-        return launch;
-    }
+    async getLaunchById(launchId: string) {
+        const launch = this.launchRepository.findById(launchId);
 
-    async delete(launchId: string){
-        if (!(await launchRepository.findOneBy({id: parseInt(launchId)})))
-            return new Error("launch not found");
-
-        await launchRepository.delete(launchId);
-    }
-
-    async update({id, launchCode, date, success, rocketId, crewId} : LaunchRequest){
-        const launch = await launchRepository.findOneBy({id: id});
         if (!launch)
-            return new Error("launch not found");
-
-        const rocket = await rocketRepository.findOneBy({ id: rocketId });
-        const crew = await crewRepository.findOneBy({ id: crewId });
-
-        launch.launchCode = launchCode;
-        launch.date = date;
-        launch.success = success;
-        launch.rocket = rocket;
-        launch.crew = crew;
-
-        await launchRepository.save(launch);
+            throw new Error('Resource not found');
 
         return launch;
     }
+
+    async createLaunch(id: string, launchCode: string, date: string, success: boolean, rocketId: string, crewId: string){
+        const rocket = await this.rocketRepository.findById(rocketId);
+        const crew = await this.crewRepository.findById(crewId);
+
+        return this.launchRepository.create({id, launchCode, date, success, rocket, crew});
+    }
+
+    async updateLaunch(id: string, launchCode: string, date: string, success: boolean, rocketId: string, crewId: string){
+        const launch = await this.getLaunchById(id);
+        
+        const rocket = await this.rocketRepository.findById(rocketId);
+        const crew = await this.crewRepository.findById(crewId);
+        
+        if (launch)
+            return this.launchRepository.update(launch, launchCode, date, success, rocket, crew);
+    }
+
+    async deleteLaunch(id: string){
+        const launch = await this.getLaunchById(id);
+        if (launch)
+            await this.launchRepository.delete(id);
+    }
+
 }
 export {
     LaunchService

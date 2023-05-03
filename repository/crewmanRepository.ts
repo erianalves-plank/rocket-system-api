@@ -1,50 +1,42 @@
+import AppDataSource from "../ormconfig";
+import { Crewman } from "../model/crewman";
+
 class CrewmanRepository {
-    private readonly url = process.env['JSON_SERVER'] + '/crewman';
 
-    async getCrewmanById(crewmanId: number) {
-        const response = await fetch(this.url + '/' + crewmanId);
-        const jsonData = await response.json();
-        return jsonData;
+    private repository = AppDataSource.getRepository(Crewman);
+
+    async findAll() {
+        const crewmen = await this.repository.find();
+        return crewmen;
     }
 
-    async getCrewmans(){
-        const response = await fetch(this.url);
-        const jsonData = await response.json();
-        return jsonData;
+    async findById(crewmanId : string){
+        const crewman = await this.repository.findOneBy({id: crewmanId});
+        return crewman;
     }
 
-    async updateCrewmanById(crewmanId : number, newCrewman: Object){
-        const response = await fetch(this.url + '/' + crewmanId, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newCrewman)
+    async create({ id, name, patent }: Crewman){
+        const crewman = this.repository.create({
+            id,
+            name,
+            patent,
         });
 
-        return response;
+        await this.repository.save(crewman);
+        return crewman;
     }
 
-    async deleteCrewmanById(crewmanId : number){
-        const response = await fetch(this.url + '/'+ crewmanId, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-        });
-        return response;
+    async update(crewman: Crewman, name : string, patent: string){
+        crewman.name = name;
+        crewman.patent = patent;
+
+        await this.repository.save(crewman);
+
+        return crewman;
     }
 
-    async createCrewman(newCrewman: Object){
-        const response = await fetch(this.url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(newCrewman)
-        });
-            
-        return response;
+    async delete(crewmanId : string){
+        return await this.repository.delete(crewmanId);
     }
 }
 

@@ -1,70 +1,55 @@
-import { Crew } from "../model/crew";
-import AppDataSource from "../ormconfig";
-import { Crewman } from "../model/crewman";
-
-const crewRepository = AppDataSource.getRepository(Crew);
-const crewmanRepository = AppDataSource.getRepository(Crewman);
-
-type CrewRequest = {
-    id?: number;
-    name: string;
-    crewmen: number[];
-
-}
+import { CrewRepository } from "../repository/crewRepository"
+import { CrewmanRepository } from "../repository/crewmanRepository";
 
 class CrewService {
-    async execute({ name, crewmen }: CrewRequest): Promise<Crew | Error> {
-        let crewmenObj: Crewman[] = [];
-        for (const crewmanId of crewmen){
-            let crewman = (await crewmanRepository.findOneBy({id: crewmanId}));
-            crewmenObj.push(crewman);
-        }
-        const crew = new Crew();
-        crew.crewmen = crewmenObj;
-        crew.name = name;
 
-        await crewRepository.save(crew);
+    private crewRepository: CrewRepository;
+    private crewmanRepository: CrewmanRepository;
 
-        return crew;
+    constructor(crewRepository: CrewRepository, crewmanRepository: CrewmanRepository){
+        this.crewRepository = crewRepository;
+        this.crewmanRepository = crewmanRepository;
     }
 
-    async getAllCrew() {
-        const crew = await crewRepository.find({
-            relations: {
-                crewmen: true,
-            },
-        });
-        return crew;
+    async getCrews(){
+        return await this.crewRepository.findAll();
     }
 
-    async getCrewById(crewId: string){
-        const crew = await crewRepository.findOneBy({id: parseInt(crewId)});
-        return crew;
-    }
+    async getCrewById(crewId: string) {
+        const crew = this.crewRepository.findById(crewId);
 
-    async delete(crewId: string){
-        if (!(await crewRepository.findOneBy({id: parseInt(crewId)})))
-            return new Error("Crew not found");
-
-        await crewRepository.delete(crewId);
-    }
-
-    async update({id, name, crewmen} : CrewRequest){
-        const crew = await crewRepository.findOneBy({id: id});
         if (!crew)
-            return new Error("Crew not found");
-
-        let crewmenObj: Crewman[] = [];
-        for (const crewmanId of crewmen){
-            let crewman = (await crewmanRepository.findOneBy({id: crewmanId}));
-            crewmenObj.push(crewman);
-        }
-        crew.name = name;
-        crew.crewmen = crewmenObj;
-
-        await crewRepository.save(crew);
+            throw new Error('Resource not found');
 
         return crew;
+    }
+
+    async createCrew(id: string, name: string, crewmenIds: string[]){
+        let crewmen = [];
+        for (const crewmanId of crewmenIds){
+            let crewman = (await this.crewmanRepository.findById(crewmanId));
+            crewmen.push(crewman);
+        }
+        return this.crewRepository.create({id, name, crewmen});
+    }
+
+    async updateCrew(id: string, name: string, crewmenIds: string[]){
+        const crew = await this.getCrewById(id);
+        
+        let crewmen = [];
+        for (const crewmanId of crewmenIds){
+            let crewman = (await this.crewmanRepository.findById(crewmanId));
+            crewmen.push(crewman);
+        }
+
+        if (crew)
+            return this.crewRepository.update(crew, name, crewmen);
+    }
+
+    async deleteCrew(id: string){
+        const crew = await this.getCrewById(id);
+        if (crew)
+            await this.crewRepository.delete(id);
     }
 
 }

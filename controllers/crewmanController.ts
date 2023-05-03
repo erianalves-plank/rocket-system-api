@@ -1,53 +1,72 @@
 import { Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
+import { CrewmanRepository } from '../repository/crewmanRepository';
 import { CrewmanService } from '../service/crewmanService';
 
 class CrewmanController {
-    async handle(request: Request, response: Response){
-        const name = request.body.name;
-        const patent = request.body.patent;
+    public service : CrewmanService;
+    public repo: CrewmanRepository;
 
-        const service = new CrewmanService();
-        const result = await service.execute({name, patent});
+    constructor(){
+        this.repo = new CrewmanRepository();
+        this.service = new CrewmanService(this.repo);
+    }
 
-        if (result instanceof Error) {
-            return response.status(400).json(result.message);
+    async handleGetCrewmen(request: Request, response: Response){
+        try {
+            const result = await this.service.getCrewmen();
+            return response.json(result);
         }
-        return response.json(result);
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleGetCrewman(request: Request, response: Response){
-        const service = new CrewmanService();
-        const crewmen = await service.getAllCrewmen();
-
-        return response.json(crewmen);
+    async handleGetCrewmanById(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            const result = await this.service.getCrewmanById(id);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
-    async handleDeleteCrewman(request: Request, response: Response){
-        const { id } = request.params;
-
-        const service = new CrewmanService();
-        
-        const result = await service.delete(id);
-
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.status(204).end();
+    async handleCreateCrewman(request: Request, response: Response){
+        try {
+            const id = uuidv4();
+            const { name, patent } = request.body;
+            const result = await this.service.createCrewman(id, name, patent) ;
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 
     async handleUpdateCrewman(request: Request, response: Response){
-        const { id } = request.params;
-        const { name, patent } = request.body;
-        const service = new CrewmanService();
-        
-        const result = await service.update({ name, patent });
+        try {
+            const id = request.params.id;
+            const { name, patent } = request.body;
+            const result = await this.service.updateCrewman(id, name, patent);
+            return response.json(result);
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
+    }
 
-        if (result instanceof Error)
-            return response.status(400).json(result.message);
-    
-
-        return response.json(result);
+    async handleDeleteCrewman(request: Request, response: Response){
+        try {
+            const id = request.params.id;
+            await this.service.deleteCrewman(id);
+            return response.status(204).end();
+        }
+        catch (err) {
+            return response.sendStatus(500).json(err.message);
+        }
     }
 }
 
