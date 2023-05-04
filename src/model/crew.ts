@@ -1,5 +1,7 @@
 import { Column, Entity, JoinTable, ManyToMany, PrimaryColumn } from "typeorm";
 import { Crewman } from "./crewman";
+import { v4 as uuidv4 } from 'uuid';
+
 @Entity('crew')
 export class Crew {
 
@@ -14,4 +16,12 @@ export class Crew {
     })
     @JoinTable()
     crewmen: Crewman[];
+
+    constructor(props: Omit<Crew, 'id'>, id?: string) {
+        Object.assign(this, props);
+
+        if (!id)
+            this.id = uuidv4();
+
+    }    
 }

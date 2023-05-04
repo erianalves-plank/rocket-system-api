@@ -1,7 +1,8 @@
-import AppDataSource from "../ormconfig";
+import AppDataSource from "../../ormconfig";
 import { Launch } from "../model/launch";
 import { Rocket } from "../model/rocket";
 import { Crew } from "../model/crew";
+import { CreateLaunchDTO } from "../dtos/createLaunchDTO";
 
 class LaunchRepository {
 
@@ -22,7 +23,7 @@ class LaunchRepository {
         return launch;
     }
 
-    async create({ id, launchCode, date, success, rocket, crew }: Launch){
+    async create(launchCode : string, date: string, success: boolean, rocket: Rocket, crew: Crew){
         const launch = new Launch({launchCode, date, success, rocket, crew});
 
         await this.repository.save(launch);

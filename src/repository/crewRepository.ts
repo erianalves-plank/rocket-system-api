@@ -1,4 +1,4 @@
-import AppDataSource from "../ormconfig";
+import AppDataSource from "../../ormconfig";
 import { Crew } from "../model/crew";
 import { Crewman } from "../model/crewman";
 
@@ -20,7 +20,7 @@ class CrewRepository {
         return crew;
     }
 
-    async create({ id, name, crewmen }: Crew){
+    async create( id: string, name: string, crewmen: Crewman[]){
         const crew = this.repository.create({
             id,
             name,

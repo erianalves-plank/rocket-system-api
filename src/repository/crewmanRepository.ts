@@ -1,4 +1,4 @@
-import AppDataSource from "../ormconfig";
+import AppDataSource from "../../ormconfig";
 import { Crewman } from "../model/crewman";
 
 class CrewmanRepository {

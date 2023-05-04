@@ -1,4 +1,4 @@
-import AppDataSource from "../ormconfig";
+import AppDataSource from "../../ormconfig";
 import { Rocket } from "../model/rocket";
 
 class RocketRepository {
@@ -16,11 +16,12 @@ class RocketRepository {
         return rocket;
     }
 
-    async create({ id, name }: Rocket){
-        const rocket = this.repository.create({
+    async create(name: string){
+        const rocket = new Rocket({name});
+/*         const rocket = this.repository.create({
             id,
             name,
-        });
+        }); */
 
         await this.repository.save(rocket);
 

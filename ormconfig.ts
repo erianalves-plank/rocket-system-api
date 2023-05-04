@@ -1,8 +1,8 @@
 import { DataSource } from "typeorm";
-import { Rocket } from "./model/rocket"; 
-import { Crewman } from "./model/crewman";
-import { Crew } from "./model/crew";
-import { Launch } from "./model/launch";
+import { Rocket } from "./src/model/rocket"; 
+import { Crewman } from "./src/model/crewman";
+import { Crew } from "./src/model/crew";
+import { Launch } from "./src/model/launch";
 
 const AppDataSource = new DataSource({
   type: "postgres",
@@ -12,6 +12,6 @@ const AppDataSource = new DataSource({
   password: "postgres",
   database: "localbase",
   entities: [Rocket, Crewman, Crew, Launch],
-  migrations: ["./database/migrations/*.ts"]
+  migrations: ["./src/database/migrations/*.ts"]
 });
 export default AppDataSource;
