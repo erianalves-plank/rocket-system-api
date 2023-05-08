@@ -1,16 +1,24 @@
 import { CreateCrewDTO } from "../dtos/createCrewDTO";
 import { Crew } from "../model/crew";
-import { crewRepository, crewmanRepository } from "../repository";
+import { CrewRepository } from "../repository/crewRepository";
+import { CrewmanRepository } from "../repository/crewmanRepository";
 import { GenericService } from "./crudService";
 
 class CrewService implements GenericService<Crew, CreateCrewDTO>{
 
+    private crewRepository: CrewRepository;
+    private crewmanRepository: CrewmanRepository
+
+    constructor(crewRepo: CrewRepository, crewmanRepo: CrewmanRepository){
+        this.crewRepository = crewRepo;
+        this.crewmanRepository = crewmanRepo;
+    }
     async get(){
-        return await crewRepository.findAll();
+        return await this.crewRepository.findAll();
     }
 
     async getById(crewId: string) {
-        const crew = crewRepository.findById(crewId);
+        const crew = this.crewRepository.findById(crewId);
 
         if (!crew)
             throw new Error('Resource not found');
@@ -21,10 +29,10 @@ class CrewService implements GenericService<Crew, CreateCrewDTO>{
     async create(data: CreateCrewDTO){
         let crewmen = [];
         for (const crewmanId of data.crewmenIds){
-            let crewman = (await crewmanRepository.findById(crewmanId));
+            let crewman = (await this.crewmanRepository.findById(crewmanId));
             crewmen.push(crewman);
         }
-        return crewRepository.create(data.id, data.name, crewmen);
+        return this.crewRepository.create(data.id, data.name, crewmen);
     }
 
     async update(id: string, data: Partial<CreateCrewDTO>){
@@ -32,18 +40,18 @@ class CrewService implements GenericService<Crew, CreateCrewDTO>{
         
         let crewmen = [];
         for (const crewmanId of data.crewmenIds){
-            let crewman = (await crewmanRepository.findById(crewmanId));
+            let crewman = (await this.crewmanRepository.findById(crewmanId));
             crewmen.push(crewman);
         }
 
         if (crew)
-            return crewRepository.update(crew, data.name, crewmen);
+            return this.crewRepository.update(crew, data.name, crewmen);
     }
 
     async delete(id: string){
         const crew = await this.getById(id);
         if (crew)
-            await crewRepository.delete(id);
+            await this.crewRepository.delete(id);
     }
 
 }

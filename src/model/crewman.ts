@@ -14,7 +14,7 @@ export class Crewman {
 
     constructor(props: Omit<Crewman, 'id'>, id?: string) {
         Object.assign(this, props);
-
+        this.id = id;
         if (!id)
             this.id = uuidv4();
 

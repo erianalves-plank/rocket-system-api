@@ -19,7 +19,7 @@ export class Crew {
 
     constructor(props: Omit<Crew, 'id'>, id?: string) {
         Object.assign(this, props);
-
+        this.id = id;
         if (!id)
             this.id = uuidv4();
 

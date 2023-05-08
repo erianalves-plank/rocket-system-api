@@ -16,7 +16,7 @@ class RocketRepository {
         return rocket;
     }
 
-    async create(name: string){
+    async create( {name} : Partial<Rocket>){
         const rocket = new Rocket({name});
 /*         const rocket = this.repository.create({
             id,

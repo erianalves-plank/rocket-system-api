@@ -25,6 +25,6 @@ app.get('/', (req, res) => {
 
 app.listen(8080, () => console.log('Running.'));
 
-/* export {
+export {
     app
-};  */
+}; 
